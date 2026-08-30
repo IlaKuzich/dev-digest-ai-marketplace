@@ -81,7 +81,7 @@ before shipping a new version.
 
 ## Status
 
-Initial release — `1.0.0`. Adapted from an internal architecture-review agent: DevDigest's
-own module/class names removed, the underlying stack (Next.js + Fastify + JS/TS ecosystem)
+Initial release — `1.0.0`. Adapted from an internal architecture-review agent: the source
+project's own module/class names removed, the underlying stack (Next.js + Fastify + JS/TS ecosystem)
 kept, and the "which repo's rules apply" question resolved by reading repo-local docs
 instead of assuming one hardcoded layout.

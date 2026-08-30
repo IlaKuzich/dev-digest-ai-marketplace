@@ -2,11 +2,11 @@
 
 This document records **how** the four previously-placeholder (`version: 0.0.0`) plugins in
 this marketplace were populated with real content, and **where** that content came from. The
-sole source is the private **DevDigest** repository (`.claude/agents/`, `.claude/skills/`,
-`.claude/hooks/`, its top-level `evals/`), where this agent architecture already exists and
-runs in production. The job was to extract what's reusable from it and package it as
-separate, self-contained plugins in this marketplace, per
-[`docs/PLUGIN-GUIDELINES.md`](./PLUGIN-GUIDELINES.md).
+sole source is a private, internal Claude Code agent setup (`.claude/agents/`,
+`.claude/skills/`, `.claude/hooks/`, its top-level `evals/`) from another project — not
+itself part of this marketplace, and not named or path-referenced here. The job was to
+extract what's reusable from it and package it as separate, self-contained plugins in this
+marketplace, per [`docs/PLUGIN-GUIDELINES.md`](./PLUGIN-GUIDELINES.md).
 
 Below is the agreed 5-step build plan, plus the decisions made while executing it. All four
 plugins are now populated and pass `claude plugin validate .`.
@@ -15,19 +15,19 @@ plan and the repository's pre-existing conventions disagreed, and how each was r
 
 ## Step 1 — source
 
-The single donor is **DevDigest** (`~/course_materials/dev-digest/`). No other repository is
-used.
+A single donor project — a private, internal repository, referenced only as "the source
+project" throughout this document. No other repository is used.
 
 ## Step 2 — sort into four groups, select components
 
-Every file from DevDigest falls into exactly one of four groups:
+Every file from the source project falls into exactly one of four groups:
 
-| Group | What it is | Examples from DevDigest |
+| Group | What it is | Illustrative examples |
 |---|---|---|
-| **Reusable** | skills, agents, hooks, and evals **without product-specific paths** | `spec-creator.md`, `implementer.md`, write-scope hook scripts, `evals/agents/architecture-reviewer/` |
-| **Project-specific** | `CLAUDE.md`, product specs, module names and rules unique to DevDigest | `server/`, `client/`, `reviewer-core/`, `Container`, `SecretsProvider`, `specs/*.md` |
-| **Optional integrations** | components with network access or credentials | MCP servers (if any), the `OPENROUTER_API_KEY`-dependent eval proxy |
-| **Local leftovers** | cache, personal memory, experiments, absolute paths | `.claude/.pr-self-review-state.json`, `results/`, `node_modules/`, any `/Users/...` path |
+| **Reusable** | skills, agents, hooks, and evals **without product-specific paths** | an agent prompt, write-scope hook scripts, an agent's eval cases |
+| **Project-specific** | a conventions doc, product specs, module names and rules unique to the source project | its own package names, internal class names, its own `specs/*.md` |
+| **Optional integrations** | components with network access or credentials | MCP servers (if any), an API-key-dependent eval proxy |
+| **Local leftovers** | cache, personal memory, experiments, absolute paths | any state file, `results/`, `node_modules/`, any local filesystem path |
 
 **Check (Step 2):** for every file carried over, its **owner** (which plugin), **consumer
 scenario** (who/what actually invokes it), and **reason** it ships together with the rest of
@@ -40,14 +40,14 @@ that plugin must all be nameable. A file that can't answer all three is a candid
 |---|---|
 | `sdd-engineering` | `spec-creator`, `implementation-planner`, `implementer`, `plan-verifier` (agents) |
 | `sdd-engineering` | `run-plan`, `workflow-retro` (orchestration skills) |
-| `sdd-engineering` | **`engineering-insights`, generalized** — moved here rather than into `engineering-paved-path`, because it no longer knows any DevDigest module names (`server/`, `client/`, `reviewer-core/`, `e2e/`) — it's a per-workflow `INSIGHTS.md` convention, not a technical best practice like `security`/`zod` |
+| `sdd-engineering` | **`engineering-insights`, generalized** — moved here rather than into `engineering-paved-path`, because it no longer knows any source-project module names — it's a per-workflow `INSIGHTS.md` convention, not a technical best practice like `security`/`zod` |
 | `sdd-engineering` | **behavior evals** — under each plugin's own `evals/`, using Claude Code's native eval format (see below), not a separate npm package |
 | dependency plugins | `researcher` → `research-tools`, `architecture-reviewer` → `architecture-review` — needed by the workflow but useful standalone, so not copied into `sdd-engineering` |
 | `engineering-paved-path` | technical skills — **one source**, never copy-pasted into each agent |
 
-`doc-writer` and `test-writer` are **not included** in any of the four plugins (`test-writer`
-is disabled in the source anyway; `doc-writer` is a product-specific documentation agent,
-out of scope for this marketplace).
+A documentation agent and a test-writing agent present in the source project are **not
+included** in any of the four plugins (the latter was already disabled in the source; the
+former is a product-specific documentation agent, out of scope for this marketplace).
 
 ## Step 3 — dependency graph
 
@@ -101,17 +101,16 @@ and `engineering-insights` is explicitly generalized and lives in `sdd-engineeri
 `pr-self-review`'s placement was an [open item](#items-that-needed-a-decision), now resolved
 — see below.
 
-### `architecture-reviewer` — repo-local docs instead of hardcoded DevDigest checks
+### `architecture-reviewer` — repo-local docs instead of hardcoded checks
 
 This Step 3 clarification and an earlier user clarification reconcile as follows: the agent
 **stays oriented on the Next.js + Fastify + JS/TS ecosystem** (it does not become
-framework-agnostic), but stops **hardcoding** DevDigest-specific paths and names
-(`reviewer-core/`, `server/`, `@devdigest/shared`, `Container`, `SecretsProvider`). Instead
-it reads the installed repository's own **repository-local architecture docs** (a file like
-`ARCHITECTURE.md` / `docs/architecture.md`, which the installer writes for their project) and
-applies the same Next.js/Fastify patterns (the onion dependency rule, DI container vs `new`,
-the RSC boundary) against it. So "generalized" here means "doesn't know one specific
-product," not "doesn't know any stack."
+framework-agnostic), but stops **hardcoding** the source project's own specific paths and
+names. Instead it reads the installed repository's own **repository-local architecture
+docs** (a file like `ARCHITECTURE.md` / `docs/architecture.md`, which the installer writes
+for their project) and applies the same Next.js/Fastify patterns (the onion dependency rule,
+DI container vs `new`, the RSC boundary) against it. So "generalized" here means "doesn't
+know one specific product," not "doesn't know any stack."
 
 ### Namespaced references
 
@@ -157,7 +156,7 @@ plugins/sdd-engineering/
 │   │   ├── SKILL.md                  # analyzes a FINISHED run (manual only,
 │   │   │                              # the final/7th phase of the chain)
 │   │   └── scripts/collect.mjs       # locates itself via ${CLAUDE_SKILL_DIR}
-│   ├── engineering-insights/SKILL.md # generalized — no DevDigest modules
+│   ├── engineering-insights/SKILL.md # generalized — no source-project modules
 │   └── pr-self-review/SKILL.md       # generalized push gate, resolved here (see below)
 ├── evals/                            # native Claude Code eval cases — see below
 ├── agents/
@@ -174,20 +173,20 @@ plugins/sdd-engineering/
 └── COMPATIBILITY.md                  # Claude Code >= 2.1.110 — see below
 ```
 
-### Editorial pass (done for every file carried over from DevDigest)
+### Editorial pass (done for every file carried over from the source project)
 
-- Stripped paths and names that exist only in DevDigest (`server/`, `client/`,
-  `reviewer-core/`, `Container`, `SecretsProvider`, `repo-intel`, …).
+- Stripped paths and names that exist only in the source project (its own package names,
+  internal class names, module names).
 - Replaced assumptions about repo structure with **explicit inputs** (parameters/placeholders
   the installer fills in for their own project).
 - Reviewed each agent's `tools:`/permissions — no permission retained that existed only for
-  a DevDigest-specific action.
+  a source-project-specific action.
 - Replaced bare local references with namespaced dependencies (`engineering-paved-path:...`,
   etc.).
 - Documented in the README **where exactly** `run-plan` expects an already-written spec
   (`specs/`) and plan (`docs/plans/`) — it only reads them, never creates them.
 - Described the behavior when a Task's `Verify`/test command **isn't found** in the
-  installer's repository, instead of silently skipping or hardcoding a DevDigest script.
+  installer's repository, instead of silently skipping or hardcoding a source-project script.
 - `${CLAUDE_PLUGIN_ROOT}` for any plugin-level file (hooks, paths in `plugin.json`).
 - `${CLAUDE_SKILL_DIR}` for supporting scripts inside a specific skill
   (`workflow-retro/scripts/collect.mjs`).
@@ -206,18 +205,18 @@ This file isn't part of the current `docs/PLUGIN-GUIDELINES.md` file set (which 
 `README.md` as required and `CHANGELOG.md` as optional) — it's an addition, not a
 replacement.
 
-**Check (Step 4):** the plugin reads no undocumented DevDigest file, and has everything it
-needs either inside its own directory or in a declared dependency plugin.
+**Check (Step 4):** the plugin reads no undocumented file from the source project, and has
+everything it needs either inside its own directory or in a declared dependency plugin.
 
 ### Evals — Claude Code's native convention, not a separate npm package
 
-DevDigest keeps its eval harness at the repository root (`evals/`, a sibling of `.claude/`)
-— a separate npm package: its own `package.json`, `pnpm-lock.yaml`, ~40 dependencies, vitest,
-its own `src/` engine (DSL, scoring, a LiteLLM proxy for OpenRouter), and cases under
-`evals/agents/architecture-reviewer/` (`.eval.ts` + `.cases.ts` + `fixtures/*.diff`). That's
-a capable CI tool, but porting it 1:1 into every plugin would mean dragging a copy of that
-heavy npm engine into four different plugins at once — exactly what the user asked to avoid
-("not a separate folder — inside the plugin").
+The source project keeps its eval harness at its own repository root (a top-level `evals/`,
+a sibling of `.claude/`) — a separate npm package: its own `package.json`, lockfile, ~40
+dependencies, vitest, its own `src/` engine (DSL, scoring, a proxy for a non-Anthropic
+backend), and cases per agent/skill (a thin runner file + a data file + fixture files).
+That's a capable CI tool, but porting it 1:1 into every plugin would mean dragging a copy of
+that heavy npm engine into four different plugins at once — exactly what the user asked to
+avoid ("not a separate folder — inside the plugin").
 
 Instead, this uses **Claude Code's own native eval convention**, confirmed directly against
 the installed CLI (`claude plugin eval --help`, Claude Code 2.1.206):
@@ -235,17 +234,17 @@ the installed CLI (`claude plugin eval --help`, Claude Code 2.1.206):
   plugin-root `evals/<agent-name>/...` shape, mirroring `agents/*.md` — no special case
   needed since the native convention already globs `evals/**` from the plugin root.
 - Real, previously-validated cases for `architecture-reviewer` (fabrication-pressure and
-  rule-citation checks) existed in the source as `.cases.ts` — carried over as two
-  `prompt.md`/`graders/criteria.md` cases with their diff fixtures, rather than written from
-  scratch. For `spec-creator`/`implementation-planner`/`implementer`/`plan-verifier`/the
-  `sdd-engineering` skills, no ready-made set existed in DevDigest — one representative case
+  rule-citation checks) existed in the source project's own eval harness — carried over as
+  two `prompt.md`/`graders/criteria.md` cases with their diff fixtures, rather than written
+  from scratch. For `spec-creator`/`implementation-planner`/`implementer`/`plan-verifier`/the
+  `sdd-engineering` skills, no ready-made set existed in the source — one representative case
   per component was authored for this release.
 - `claude plugin eval` reported itself as **early access** at authoring time on Claude Code
   2.1.206 — the case files are written and ready, but actually running them requires whatever
   opt-in that feature currently needs. Recorded in each plugin's `COMPATIBILITY.md`.
 
 (An earlier draft of this plan assumed a different, `evals.json`-based format based on
-secondhand research about `skill-creator`'s tooling. That format does not match what
+secondhand research about a different plugin's own tooling. That format does not match what
 `claude plugin eval --help` actually documents on the installed CLI, so it was replaced.)
 
 ## Step 5 — registering the plugins in the marketplace
@@ -353,7 +352,7 @@ The mechanics that had to be preserved exactly, not just in spirit:
 |---|---|---|
 | `run-plan` | `implement/SKILL.md` (renamed) | Orchestrates an **already-ready** spec+plan: Mode A gate → N×`implementer` → `architecture-review:architecture-reviewer` with a bounded fix loop → Mode B → `pr-self-review` → human gate before push/PR. **Never preloaded** into any agent — it's an orchestration skill, not a practice |
 | `workflow-retro` | `workflow-retro/SKILL.md` | **Manual-only** (`/workflow-retro`), the final (7th) phase of the chain — run by a human **separately from** `run-plan`, after a run has already finished. Reads the run's **own transcripts** (`scripts/collect.mjs`, locating itself via `${CLAUDE_SKILL_DIR}`), computes exact tokens/cost/roster/warm-vs-cold reuse, judges the run against the README's rules, writes a report to `docs/agent-runs/`. Grades the **process**, not the code |
-| `engineering-insights` | `engineering-insights/SKILL.md`, generalized | Append-only `INSIGHTS.md` convention, no DevDigest modules. Now **local** to `sdd-engineering` (not namespaced), since this is where `implementer` actually consumes it |
+| `engineering-insights` | `engineering-insights/SKILL.md`, generalized | Append-only `INSIGHTS.md` convention, no source-project modules. Now **local** to `sdd-engineering` (not namespaced), since this is where `implementer` actually consumes it |
 | `pr-self-review` | `pr-self-review/SKILL.md`, generalized | Resolved to live here (see [item 4](#items-that-needed-a-decision)) — the pre-push diff gate `run-plan` calls at its final phase, with its push-gate hook wired via `hooks/hooks.json` |
 
 ### Namespaced cross-plugin calls (hard rule from Step 4)
@@ -380,8 +379,8 @@ something that actually executes, rather than staying prose.
 
 ### README.md — contents (how it all works together)
 
-Structure (modeled on `~/course_materials/dev-digest/.claude/agents/README.md`, condensed to
-plugin-README size):
+Structure (modeled on the source project's own agents-README, condensed to plugin-README
+size):
 
 1. **Catalog** — agent/skill → model → write scope → purpose table (as above).
 2. **Requires** — `engineering-paved-path ^1.0.0`, `research-tools ^1.0.0`,
@@ -432,8 +431,8 @@ plugins/research-tools/
 `researcher.md` was carried over nearly unchanged — it was already product-agnostic:
 read-only (`Read, Grep, Glob, Bash, WebSearch, WebFetch`), two scopes (codebase/web), a
 strict report format (`FOUND/PARTIAL/NOT_FOUND`), "an honest not-found is a valid result."
-The only cleanup needed was replacing DevDigest-specific path examples (`server/`, `client/`)
-in the prompt text with generic ones.
+The only cleanup needed was replacing source-project-specific path examples in the prompt
+text with generic ones.
 
 README: no `## Requires` section (a leaf, independent agent; `sdd-engineering` depends on it,
 not the other way around).
@@ -445,7 +444,7 @@ plugins/architecture-review/
 ├── .claude-plugin/plugin.json        # dependencies: [{ "name": "engineering-paved-path", "version": "^1.0.0" }]
 ├── agents/architecture-reviewer.md   # Next.js + Fastify + JS/TS ecosystem, repo-local docs
 ├── evals/                            # two native prompt.md/graders/criteria.md cases,
-│                                      # carried over from the source's real .cases.ts
+│                                      # carried over from the source's own eval cases
 │                                      # (fabrication-pressure and rule-citation checks)
 ├── COMPATIBILITY.md
 └── README.md
@@ -462,11 +461,12 @@ and plugins, not an exercise in abstracting architectural principles. So `archit
 **stays oriented on the Next.js + Fastify + broader JS/TS ecosystem** (React, Drizzle/Postgres)
 — the exact stack the source agent was written for — and "generalized" from Step 3 means:
 
-- Removing DevDigest-specific proper nouns (`Container`, `SecretsProvider`, `GitHubClient`,
-  module names like `repo-intel`) — specific to one product, not to Next.js/Fastify in general.
-- Replacing hardcoded checks against DevDigest paths (`reviewer-core/`, `server/`,
-  `@devdigest/shared`) with **reading the installer's own repository-local architecture
-  docs** (Step 3), and applying the same Next.js/Fastify patterns against them.
+- Removing the source project's own proper nouns (its DI-container type name, its secrets
+  abstraction name, its own module names) — specific to one product, not to Next.js/Fastify
+  in general.
+- Replacing hardcoded checks against the source project's own paths with **reading the
+  installer's own repository-local architecture docs** (Step 3), and applying the same
+  Next.js/Fastify patterns against them.
 - Keeping the **concrete, stack-specific** rules as-is: the onion dependency rule for
   Fastify services, DI container vs `new`, the Next.js App Router RSC boundary,
   repository/DTO boundaries for Drizzle+Postgres.
@@ -571,7 +571,7 @@ Gaps between the plan and the repository's prior state — resolved during imple
    `ilakuzich@gmail.com`) rather than the plan's illustrative `{ "name": "AI Engineering" }`.
 4. **`pr-self-review` — where does it live?** Resolved: `sdd-engineering/skills/pr-self-review/`,
    generalized the same way as `engineering-insights` (same "Workflow" category, same
-   DevDigest-module-removal treatment), with its push-gate hook (`pr-self-review-gate.sh` +
+   module-name-removal treatment), with its push-gate hook (`pr-self-review-gate.sh` +
    `pr-review-diff-hash.sh`) under `sdd-engineering/hooks/`, wired via `${CLAUDE_PLUGIN_ROOT}`.
 5. **Evals format.** Resolved by direct verification against the installed CLI — see the
    "Evals" section under Step 4 above. The earlier `evals.json`-based assumption was replaced

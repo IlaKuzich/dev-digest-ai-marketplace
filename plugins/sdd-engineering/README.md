@@ -142,8 +142,8 @@ concern the marketplace maintainers keep current.
 
 ## Status
 
-Initial release — `1.0.0`. Adapted from an internal SDD pipeline: DevDigest-specific paths,
-package names, and class names removed and replaced with either namespaced references to
+Initial release — `1.0.0`. Adapted from an internal SDD pipeline: source-project-specific
+paths, package names, and class names removed and replaced with either namespaced references to
 `engineering-paved-path`/`research-tools`/`architecture-review`, or explicit "if the repo has
 one" framing for conventions (a learning log, a conventions doc) this plugin can't assume
 every installer's project already keeps.
