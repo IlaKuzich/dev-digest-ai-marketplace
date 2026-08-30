@@ -32,7 +32,17 @@ bump_semver() {
 
 plugin_dir() { echo "plugins/$1"; }
 plugin_manifest() { echo "$(plugin_dir "$1")/.claude-plugin/plugin.json"; }
-tag_name() { echo "$1-v$2"; }
+# {name}--v{version} for plugins — matches the convention `claude plugin tag` creates
+# natively (verified via `claude plugin tag --help`). The marketplace catalog isn't a
+# plugin (no plugin.json `claude plugin tag` can validate against), so it keeps its own
+# single-dash convention: marketplace-v{version}.
+tag_name() {
+  if [[ "$1" == "marketplace" ]]; then
+    echo "marketplace-v$2"
+  else
+    echo "$1--v$2"
+  fi
+}
 
 marketplace_entry_exists() {
   local name=$1

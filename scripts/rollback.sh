@@ -10,7 +10,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") <plugin-name> <target-version> [-m "reason"]
 
-Restores plugin content from git tag <plugin-name>-v<target-version> and
+Restores plugin content from git tag <plugin-name>--v<target-version> and
 republishes it as a new patch release (content = old, version = new).
 
 Example:
@@ -37,7 +37,7 @@ require_clean_tree
 SRC_TAG=$(tag_name "$TARGET" "$TARGET_VERSION")
 if ! git rev-parse "$SRC_TAG" >/dev/null 2>&1; then
   echo "Error: tag $SRC_TAG not found. Available releases for '$TARGET':" >&2
-  git tag -l "${TARGET}-v*" >&2
+  git tag -l "${TARGET}--v*" >&2
   exit 1
 fi
 
