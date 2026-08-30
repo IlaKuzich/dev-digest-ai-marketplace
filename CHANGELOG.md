@@ -6,3 +6,6 @@ most recent entry at the bottom. Each entry corresponds to a git tag named
 
 Rollbacks are recorded as new forward releases that restore prior content —
 version numbers are never reused or rewritten. See [docs/RELEASES.md](./docs/RELEASES.md).
+
+## research-tools-v1.1.0
+Record repo commit hash in codebase reports (Methodology section)

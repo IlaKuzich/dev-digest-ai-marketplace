@@ -62,5 +62,6 @@ None.
 
 ## Status
 
-Initial release — `1.0.0`. Ported near-verbatim from an internal research agent; already
-project-agnostic (no hardcoded paths or product-specific conventions).
+`1.1.0`. Codebase reports now record the repo's commit hash in "Methodology" so findings can
+be tied to a point in time. Initially ported near-verbatim from an internal research agent;
+already project-agnostic (no hardcoded paths or product-specific conventions).

@@ -1,12 +1,17 @@
 {
   "name": "research-tools",
   "displayName": "Research Tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A read-only research subagent that investigates a codebase or the web and reports findings with evidence — never modifies anything.",
   "author": {
     "name": "IlyaKuzich",
     "email": "ilakuzich@gmail.com"
   },
   "license": "MIT",
-  "keywords": ["research", "read-only", "investigation", "web-search"]
+  "keywords": [
+    "research",
+    "read-only",
+    "investigation",
+    "web-search"
+  ]
 }

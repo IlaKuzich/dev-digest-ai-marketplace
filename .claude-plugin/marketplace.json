@@ -20,7 +20,7 @@
       "source": "./plugins/research-tools",
       "displayName": "Research Tools",
       "description": "A read-only research subagent that investigates a codebase or the web and reports findings with evidence.",
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     {
       "name": "architecture-review",
