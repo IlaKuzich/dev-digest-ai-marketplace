@@ -1,52 +1,67 @@
 # Marketplace site spec
 
-`site/` is a static, browsable index of this marketplace's plugins, deployed to GitHub Pages
-by `.github/workflows/pages.yml`. It exists so someone can discover what's in the marketplace
-without cloning the repo or knowing the `/plugin` CLI syntax.
+`site/` is a static React app (Vite + React Router `HashRouter`), deployed to GitHub Pages by
+`.github/workflows/deploy-pages.yml`. It exists so someone can search, browse, and install
+plugins/skills/commands/agents from this marketplace without cloning the repo or knowing the
+`/plugin` CLI syntax. There is no backend — everything is either baked in at build time or
+fetched from public, CORS-enabled APIs at runtime.
+
+See also [docs/marketplace-ui-spec.md](./marketplace-ui-spec.md) for the original design
+rationale behind the four views below.
 
 ## Data source
 
-`scripts/build-index.mjs` is the single source of truth for what the site displays. It:
+Two build-time scripts are the single source of truth for what the site displays — the page
+never reads `.claude-plugin/marketplace.json` or a plugin's `plugin.json` directly in the
+browser:
 
-1. Reads `.claude-plugin/marketplace.json`.
-2. For each entry whose `source` is a relative path (`./plugins/<name>`), reads that plugin's
-   `.claude-plugin/plugin.json` and `README.md`.
-3. Emits `site/index.json` — an array of `{ name, displayName, description, version, keywords,
-   installCommand, readmeExcerpt }` objects, one per plugin.
-
-The site never reads `marketplace.json` or `plugin.json` directly in the browser — everything
-goes through `index.json` so the page has one static file to fetch, and so a plugin can be
-represented on the site even if its `source` isn't a local path (future case).
+- `scripts/build-index.mjs` reads `.claude-plugin/marketplace.json`, and for each plugin whose
+  `source` is a local path (`./plugins/<name>`) reads `plugin.json`, `README.md`, and walks
+  `commands/*.md`, `skills/<name>/SKILL.md`, `agents/*.md`. It emits
+  `site/public/data/index.json` — a flat array of entries (`type: "plugin" | "skill" | "command"
+  | "agent"`), each carrying enough text (`description`, `readmeText`/`bodyText`, `keywords`) for
+  client-side full-text search, plus `lastUpdatedAt`/`firstAddedAt` from `git log`.
+- `scripts/build-changelog.mjs` walks git history for `plugins/**` and
+  `.claude-plugin/marketplace.json`, classifies each touched file into an update-feed event, and
+  emits `site/public/data/changelog.json` (also used for the stats view's growth chart and
+  contributor tally) and `site/public/feed.xml` (Atom feed for the "What's new" subscribe link).
 
 ## Page contents
 
-`site/index.html` renders, per plugin:
+The app has four tabs plus an item-detail route:
 
-- `displayName` (falls back to `name`)
-- `description`
-- `version` — shown as `vX.Y.Z`; a `0.0.0` version renders a "placeholder — not yet published" badge instead of a version number
-- `keywords`, as filterable tags
-- The install command, pre-filled and copyable:
-  ```
-  /plugin install <name>@dev-digest-ai-marketplace
-  ```
-- A link to the plugin's `README.md` on GitHub (not inlined — keeps `index.json` small)
+- **Catalog** (`#/catalog`) — free-text search across all entries (name, description, keywords,
+  full body text), type filters (plugin/skill/command/agent), a "recommended to start" section
+  (plugins tagged `starter` in `keywords`), and sort by relevance/last-updated/name.
+- **Item detail** (`#/item/<id>`) — full description, keywords, a copy-to-clipboard install
+  snippet (`/plugin marketplace add …` + `/plugin install …`), child artifacts for a plugin, and
+  related plugins (shared keywords).
+- **What's new** (`#/whatsnew`) — timeline built from `changelog.json`, plus an RSS/Atom
+  subscribe link to `feed.xml`.
+- **Stats** (`#/stats`) — counts by type, a plugin-growth chart, a tag cloud, contributors (all
+  from `index.json`/`changelog.json`), and live GitHub star/fork counts fetched client-side from
+  the public GitHub REST API (fails silently to a dash if rate-limited).
+- **Getting started** (`#/onboarding`) — copyable install commands and a localStorage-backed
+  progress checklist; a first-visit tour banner also lives on the Catalog tab.
 
-Plugins are sorted alphabetically by `name`. There is no pagination target — this marketplace
-is not expected to exceed a few dozen plugins.
+All UI copy lives in `site/src/i18n/en.js`, not inline in components.
 
 ## Build & deploy
 
-- `node scripts/build-index.mjs` writes `site/index.json`. It must be run (via CI) before the
-  site is deployed — `site/index.json` is generated, not committed.
-- `.github/workflows/pages.yml` runs the build on every push to `main` that touches
-  `.claude-plugin/`, `plugins/`, or `site/`, then deploys `site/` via
-  `actions/deploy-pages`.
-- The site has no server-side component and no build step beyond generating `index.json` —
-  keep it that way; this is a catalog page, not an application.
+- `node scripts/build-index.mjs && node scripts/build-changelog.mjs` write
+  `site/public/data/*.json` + `site/public/feed.xml`. Vite copies `site/public/` verbatim into
+  `site/dist/` on build — these files are generated, not committed.
+- `.github/workflows/deploy-pages.yml` runs on every PR and push touching `site/`, `scripts/`,
+  `.claude-plugin/`, or `plugins/`: the `build-site` job always builds (a standalone pass/fail
+  check, separate from `validate.yml`'s harness check); the `deploy` job only runs on push to
+  `main`, uploading `site/dist/` via `actions/deploy-pages`.
+- Local dev: from the repo root, run the two `node scripts/...` commands above, then
+  `cd site && npm install && npm run dev` (or `npm run build && npx serve dist` to check the
+  actual production build).
 
 ## What changes require updating this spec
 
-Any change to what `index.json` contains, or to what the page displays, must update this file
-in the same PR — `SITE-SPEC.md` is meant to be read instead of `build-index.mjs` by someone who
-just wants to know what the site shows, and it drifting from the code defeats that purpose.
+Any change to what `index.json`/`changelog.json` contain, what a view displays, or how the
+workflow is triggered must update this file in the same PR — `SITE-SPEC.md` is meant to be read
+instead of the source by someone who just wants to know what the site shows, and it drifting
+from the code defeats that purpose.
