@@ -29,8 +29,8 @@ ikdd-ai-marketplace/
 
 ## Adding a new plugin
 
-1. Copy `plugins/example-plugin` to `plugins/<your-plugin-name>`.
-2. Update `plugin.json` — `name`, `version`, `description`, `author`.
+1. Create `plugins/<your-plugin-name>/.claude-plugin/plugin.json` with at minimum `name`, `version`, `description`.
+2. Add `commands/`, `skills/`, `agents/`, or `hooks/` as needed.
 3. Add an entry for it in `.claude-plugin/marketplace.json` under `plugins`.
 4. Run `claude plugin validate .` locally.
 5. Open a PR — see [CONTRIBUTING.md](./CONTRIBUTING.md).
