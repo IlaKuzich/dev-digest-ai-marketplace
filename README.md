@@ -23,6 +23,7 @@ ikdd-ai-marketplace/
 │       ├── skills/           # auto-discovered skills
 │       ├── agents/           # subagents
 │       └── hooks/            # hooks.json
+├── scripts/                   # release.sh / rollback.sh
 └── .github/                  # CI, issue templates, CODEOWNERS
 ```
 
@@ -41,3 +42,11 @@ claude plugin validate .
 ```
 
 CI runs the same check on every pull request (see `.github/workflows/validate.yml`).
+
+## Releases and rollbacks
+
+Publishing a new plugin version or undoing a bad one is done via `scripts/release.sh` and `scripts/rollback.sh`, never by hand-editing version numbers — see [RELEASE.md](./RELEASE.md).
+
+## Security
+
+Hooks, MCP servers, and external plugin sources can run code on a user's machine — see [SECURITY.md](./SECURITY.md) for review requirements and how to report a vulnerability.

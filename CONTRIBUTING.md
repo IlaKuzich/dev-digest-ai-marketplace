@@ -15,11 +15,11 @@
    ```
 5. Run `claude plugin validate .` and fix any errors.
 6. Open a pull request. A `CODEOWNERS`-designated reviewer will be requested automatically.
+7. Once merged, versioning and publishing a new plugin version is done via `scripts/release.sh` — see [RELEASE.md](./RELEASE.md).
 
 ## Guidelines
 
-- Use semantic versioning (`MAJOR.MINOR.PATCH`) for every plugin.
-- Keep `plugin.json` as the source of truth for a plugin's own metadata (`strict: true` behavior).
-- Do not commit secrets, API keys, or credentials in any plugin.
-- Prefer relative `source` paths (`./plugins/...`) for plugins hosted in this monorepo; use `github`/`url` sources only for plugins hosted elsewhere.
+- Prefer relative `source` paths (`./plugins/...`) for plugins hosted in this monorepo; use `github`/`url` sources only for plugins hosted elsewhere, and see [SECURITY.md](./SECURITY.md) for pinning requirements on those.
 - If renaming or removing a plugin, add an entry to the `renames` field in `marketplace.json` so existing installs don't break.
+- Versioning, releasing, and rolling back a plugin: [RELEASE.md](./RELEASE.md).
+- Security requirements for hooks, MCP servers, secrets, and reporting a vulnerability: [SECURITY.md](./SECURITY.md).
