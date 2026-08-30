@@ -126,6 +126,16 @@ def run_claude(prompt: str, cwd: Path, plugin_dirs: list[Path], model: str | Non
     return data.get("result", "")
 
 
+def strip_json_fence(text: str) -> str:
+    """Cheap grader models don't reliably obey 'no markdown fences' — strip a
+    ```json ... ``` or ``` ... ``` wrapper if the model added one anyway."""
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        stripped = re.sub(r"^```[a-zA-Z]*\n?", "", stripped)
+        stripped = re.sub(r"\n?```$", "", stripped)
+    return stripped.strip()
+
+
 def grading_prompt(criteria_md: str, response_text: str) -> str:
     return (
         "You are grading an AI agent's response against a fixed checklist. For each checklist "
@@ -182,7 +192,7 @@ def main() -> None:
         print(f"[{c['name']}] grading...", file=sys.stderr)
         grading_raw = run_claude(grading_prompt(criteria, response), REPO_ROOT, [], args.model, args.timeout)
         try:
-            grading = json.loads(grading_raw)
+            grading = json.loads(strip_json_fence(grading_raw))
         except json.JSONDecodeError:
             n = criteria.count("- [ ]") or 1
             grading = {
