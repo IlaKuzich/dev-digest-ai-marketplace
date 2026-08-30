@@ -1,0 +1,89 @@
+# plugin-evals — behavior evals for plugins/*/evals/<case>/prompt.md + graders/criteria.md.
+# Ported from the original DevDigest repo's eval-agents.yml: runs `claude -p` through a local
+# LiteLLM proxy so it can use a cheap OpenRouter model instead of a direct Anthropic API key
+# (the Agent SDK/`claude -p` only speaks the Anthropic wire protocol — see evals/proxy/).
+#
+# Model: OpenRouter, default google/gemini-2.5-flash — same choice the original repo verified
+# reliably dispatches subagents (gpt-4o-mini was tried there and rejected: it fabricates a
+# "completed" response for a subagent call that never actually ran). Kept NON-BLOCKING
+# regardless, since any cheap model can still be flaky under load. Override via workflow_dispatch
+# inputs (Actions tab → Run workflow), no code change needed.
+name: plugin-evals
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "plugins/**/evals/**"
+      - "scripts/run-plugin-evals.py"
+      - "evals/proxy/**"
+      - ".github/workflows/plugin-evals.yml"
+  pull_request:
+    paths:
+      - "plugins/**/evals/**"
+      - "scripts/run-plugin-evals.py"
+      - "evals/proxy/**"
+      - ".github/workflows/plugin-evals.yml"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "EVAL_MODEL override (OpenRouter slug, e.g. google/gemini-2.5-flash)"
+        required: false
+        type: string
+      threshold:
+        description: "Minimum pass rate to succeed (0-1)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plugin-evals-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EVAL_BACKEND: openrouter
+  EVAL_MODEL: ${{ inputs.model || 'google/gemini-2.5-flash' }}
+  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+  OPENROUTER_BASE_URL: http://localhost:4000
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - run: docker compose -f evals/proxy/docker-compose.yml up -d
+      - name: Wait for proxy
+        run: |
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:4000/health/liveliness && exit 0
+            sleep 3
+          done
+          echo "proxy never became healthy" >&2
+          exit 1
+
+      # continue-on-error HERE (not just at job level) so this check shows green in the PR —
+      # the run still executes for real and its pass/fail is visible in this step's own log,
+      # it just doesn't turn the job/check red on a model-capability miss (see header comment).
+      - id: run_evals
+        continue-on-error: true
+        run: python3 scripts/run-plugin-evals.py --threshold "${{ inputs.threshold || '0.9' }}"
+
+      - if: steps.run_evals.outcome == 'failure'
+        run: docker compose -f evals/proxy/docker-compose.yml logs --tail 100
+
+      - if: always()
+        run: docker compose -f evals/proxy/docker-compose.yml down
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-eval-results
+          path: evals/results/
+          if-no-files-found: ignore

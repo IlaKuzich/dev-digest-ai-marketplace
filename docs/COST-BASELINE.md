@@ -11,7 +11,8 @@ For every `agents/*.md` a plugin ships, record:
 
 | Plugin | Agent | Model | Typical run (input/output tokens, rough) | Notes |
 |---|---|---|---|---|
-| _(none yet — all four plugins are placeholders, see below)_ | | | | |
+| sdd-engineering | implementer | sonnet (pinned in frontmatter) | ~3.9M tokens, $2.20, 53 turns for a 2-file/~15-line change | Measured 2026-08-31 in a consumer project (`next_js_harness_testing`), task: return-reason length validation. Cold spawn — ~two-thirds of the run's turns went to environment setup (installing `bun`, `bun install`) the orchestrator's own shell had already paid for, not to the edit itself. See that project's `docs/agent-runs/2026-08-31-return-reason-length-validation.md`. |
+| _(remaining agents — spec-creator, implementation-planner, plan-verifier, architecture-reviewer, researcher — not yet measured)_ | | | | |
 
 - **Model**: the `model:` field in the agent's frontmatter (`opus` / `sonnet` / `haiku`, or
   inherited from the session if unset — call that out explicitly, since it means the plugin's
@@ -25,10 +26,18 @@ For every `agents/*.md` a plugin ships, record:
 
 ## Baseline for this repo today
 
-All four `plugins/*` directories are placeholders (`version: 0.0.0`, no `agents/`/`skills/`
-content yet) — there is nothing to baseline. This table must be filled in as part of the PR
-that replaces a placeholder with real content; see the checklist in
-[PLUGIN-GUIDELINES.md](./PLUGIN-GUIDELINES.md).
+All four plugins now ship real `agents/`/`skills/` content (`engineering-paved-path` and
+`architecture-review`/`sdd-engineering` at `1.0.0`, `research-tools` at `1.1.0`), but only one
+agent — `sdd-engineering:implementer` — has an actual measured run so far (row above). The
+remaining agents in the table must be filled in from a real run, not a guess, as they get
+exercised — see the checklist in [PLUGIN-GUIDELINES.md](./PLUGIN-GUIDELINES.md).
+
+**Optimization candidate identified, not yet applied:** the same run's retro flagged that a
+2-file/line-level-planned change didn't need a cold `implementer` spawn at all — the
+orchestrator could have made the edits directly. Adding a spawn-threshold heuristic ("≤2 files
+and the plan is already line-level ⇒ edit directly, don't spawn") to `sdd-engineering`'s
+`run-plan` skill would likely take this class of run from ~$2.20/cold-spawn to near $0. This
+needs a before/after pair (this row is "before") once the heuristic ships.
 
 ## When a change affects cost
 

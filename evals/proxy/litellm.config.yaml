@@ -1,0 +1,33 @@
+# LiteLLM translating proxy for plugin evals (ported from the original DevDigest repo).
+#
+# WHY THIS EXISTS
+# `claude -p` (and the Agent SDK underneath it) only speaks the Anthropic Messages wire protocol
+# (POST /v1/messages). OpenRouter's native "Anthropic Skin" serves that shape ONLY for
+# anthropic/* slugs, so cheap non-Anthropic models (Gemini Flash, DeepSeek, Llama, …) can't back
+# an agent-under-test's subagent/tool-use calls directly.
+#
+# LiteLLM's proxy accepts BOTH shapes on one port:
+#   - POST /v1/messages          (Anthropic format)  ← `claude -p`, via ANTHROPIC_BASE_URL
+#   - POST /chat/completions      (OpenAI format)     ← unused here, kept for parity with upstream
+# and translates each to the target model on OpenRouter. Point ANTHROPIC_BASE_URL at this proxy
+# (http://localhost:4000) and `claude -p` can run on any OpenRouter model, cheaply, on CI.
+#
+# The wildcard route forwards whatever --model you pass straight through to OpenRouter, so this
+# file never needs editing to try a new model — e.g. --model google/gemini-2.5-flash arrives here
+# as "google/gemini-2.5-flash" and is dispatched as "openrouter/google/gemini-2.5-flash".
+
+model_list:
+  - model_name: "*"
+    litellm_params:
+      model: "openrouter/*"
+      api_key: os.environ/OPENROUTER_API_KEY
+
+litellm_settings:
+  # Deterministic evals: never retry-with-jitter behind our back; the runner owns retries.
+  drop_params: true
+
+general_settings:
+  # No master_key on purpose: this is an ephemeral local/CI gateway. It runs in "no-auth" mode,
+  # so the bearer token `claude -p` forwards (ANTHROPIC_AUTH_TOKEN=OPENROUTER_API_KEY) is ignored
+  # and the proxy authenticates to OpenRouter with OPENROUTER_API_KEY from its own environment.
+  # Do NOT expose this port publicly.

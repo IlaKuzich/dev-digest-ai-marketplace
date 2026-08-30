@@ -1,0 +1,26 @@
+# Ephemeral LiteLLM translating proxy for plugin evals. See litellm.config.yaml for why.
+#
+#   OPENROUTER_API_KEY=sk-or-... docker compose -f evals/proxy/docker-compose.yml up
+#
+# Exposes http://localhost:4000 speaking BOTH Anthropic (/v1/messages) and OpenAI
+# (/chat/completions) formats. Point ANTHROPIC_BASE_URL at it to route `claude -p` through
+# OpenRouter instead of api.anthropic.com. Ported from the original DevDigest repo's
+# evals/proxy/ (same mechanism, generic across any Claude Code plugin).
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: marketplace-eval-litellm
+    ports:
+      - "4000:4000"
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?set OPENROUTER_API_KEY in the environment}
+    volumes:
+      - ./litellm.config.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--num_workers", "1"]
+    healthcheck:
+      # The image ships Python but not necessarily curl; hit the liveliness endpoint via urllib.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/liveliness')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
