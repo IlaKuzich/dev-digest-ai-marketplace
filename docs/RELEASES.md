@@ -1,4 +1,4 @@
-# Releasing and rolling back
+# Releases, rollback, and update channels
 
 This marketplace is a git repository that Claude Code reads directly (`/plugin marketplace add owner/repo`), tracking the `main` branch. That makes it **mutable state**, not an immutable package registry — which shapes both how releases are cut and how a bad release gets undone.
 
@@ -18,8 +18,8 @@ Use `scripts/release.sh` instead of hand-editing versions — it keeps `plugin.j
 scripts/release.sh <plugin-name|marketplace> <patch|minor|major|X.Y.Z> [-m "note"]
 
 # examples
-scripts/release.sh example-plugin patch -m "Fix hello command output"
-scripts/release.sh example-plugin 2.0.0 -m "Breaking: renamed command"
+scripts/release.sh research-tools patch -m "Fix researcher tool allowlist"
+scripts/release.sh sdd-engineering 2.0.0 -m "Breaking: renamed spec-creator output path"
 scripts/release.sh marketplace minor -m "Add category field to catalog"
 ```
 
@@ -45,7 +45,7 @@ Because `main` is mutable and already-installed users track it, a rollback must 
 scripts/rollback.sh <plugin-name> <target-version> [-m "reason"]
 
 # example: v1.3.0 is broken, restore what v1.2.0 shipped
-scripts/rollback.sh example-plugin 1.2.0 -m "v1.3.0 broke the hello command"
+scripts/rollback.sh sdd-engineering 1.2.0 -m "v1.3.0 broke the spec-creator write-scope hook"
 ```
 
 What it does:
@@ -56,15 +56,30 @@ What it does:
 
 Push the same way: `git push origin main --tags`.
 
-## Pinning for consumers
+## Release channels
 
-Anyone installing from this marketplace can pin to a specific release instead of tracking `main`:
+Consumers choose their channel by what they pass to `/plugin marketplace add`:
 
-```
-/plugin marketplace add IlaKuzich/ikdd-ai-marketplace@<plugin-name>-v<version>
-```
+| Channel | How to install | Gets |
+|---|---|---|
+| **latest** (`main`) | `/plugin marketplace add IlaKuzich/dev-digest-ai-marketplace` | Whatever is on `main` right now, including in-progress changes merged since the last tag. Fine for trying things out; not recommended for anything you depend on. |
+| **pinned** (a release tag) | `/plugin marketplace add IlaKuzich/dev-digest-ai-marketplace@<plugin-name>-v<version>` | Exactly the content published at that tag. Never changes under you. **Recommended for any real usage.** |
 
-This is the recommended way to depend on this marketplace from anything other than casual/course use, since it isolates you from in-progress changes on `main`.
+There is no separate "beta"/"stable" branch — a plugin at `0.x.y` (per SemVer) is implicitly
+pre-1.0/unstable, and `major` version bumps are the signal for breaking changes. Pin to a tag
+if you need stability regardless of version number.
+
+## Updating
+
+Updating means moving a pin forward, not mutating anything in place:
+
+1. Check `CHANGELOG.md` (or `git tag -l "<plugin-name>-v*"`) for the latest tag of the plugin you depend on.
+2. Re-run `/plugin marketplace add IlaKuzich/dev-digest-ai-marketplace@<plugin-name>-v<new-version>` (or `/plugin install <plugin-name>@dev-digest-ai-marketplace` if you track `main`).
+3. Re-read the CHANGELOG entry for that tag — a `major` bump means behavior you rely on may have changed.
+
+If updating breaks you, that's what [Rolling back a plugin](#rolling-back-a-plugin) above is for
+— either roll the *plugin* back yourself (maintainers) or simply re-pin your own install to the
+previous tag (consumers).
 
 ## Security-sensitive changes
 

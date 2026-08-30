@@ -1,0 +1,12 @@
+{
+  "name": "engineering-paved-path",
+  "displayName": "Engineering Paved Path",
+  "version": "0.0.0",
+  "description": "PLACEHOLDER — will bundle the team's supported engineering conventions (backend/frontend/full-stack skills, PR self-review gate) as reusable skills.",
+  "author": {
+    "name": "IlyaKuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["placeholder", "paved-path", "engineering-conventions"]
+}

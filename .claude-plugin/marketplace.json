@@ -1,10 +1,39 @@
 {
-  "name": "ikdd-ai-marketplace",
+  "name": "dev-digest-ai-marketplace",
   "owner": {
     "name": "IlyaKuzich",
     "email": "ilakuzich@gmail.com"
   },
-  "description": "IKDD AI Marketplace — a catalog of Claude Code plugins (agents, skills, commands) for the course project.",
+  "description": "DevDigest AI Marketplace — a catalog of Claude Code plugins (agents, skills, commands) maintained independently of the DevDigest product repo, with its own release cadence.",
   "version": "0.1.0",
-  "plugins": []
+  "plugins": [
+    {
+      "name": "engineering-paved-path",
+      "source": "./plugins/engineering-paved-path",
+      "displayName": "Engineering Paved Path",
+      "description": "PLACEHOLDER — supported engineering conventions as reusable skills.",
+      "version": "0.0.0"
+    },
+    {
+      "name": "research-tools",
+      "source": "./plugins/research-tools",
+      "displayName": "Research Tools",
+      "description": "PLACEHOLDER — read-only research subagent.",
+      "version": "0.0.0"
+    },
+    {
+      "name": "architecture-review",
+      "source": "./plugins/architecture-review",
+      "displayName": "Architecture Review",
+      "description": "PLACEHOLDER — read-only architecture review subagent.",
+      "version": "0.0.0"
+    },
+    {
+      "name": "sdd-engineering",
+      "source": "./plugins/sdd-engineering",
+      "displayName": "Spec-Driven Development Engineering",
+      "description": "PLACEHOLDER — spec-driven development agent pipeline.",
+      "version": "0.0.0"
+    }
+  ]
 }

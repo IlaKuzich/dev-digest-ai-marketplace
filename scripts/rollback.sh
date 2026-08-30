@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Restore a plugin's content from a previous release tag and republish it as a NEW,
 # forward version. Never reuses or rewrites a previously published version/tag.
-# See RELEASE.md for the full process.
+# See docs/RELEASES.md for the full process.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 source "$(dirname "$0")/_lib.sh"
