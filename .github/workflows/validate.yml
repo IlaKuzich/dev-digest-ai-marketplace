@@ -1,0 +1,35 @@
+name: Validate marketplace
+
+on:
+  pull_request:
+    paths:
+      - ".claude-plugin/**"
+      - "plugins/**"
+  push:
+    branches: [main]
+    paths:
+      - ".claude-plugin/**"
+      - "plugins/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate marketplace.json is valid JSON
+        run: python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
+
+      - name: Validate each plugin.json is valid JSON
+        run: |
+          set -e
+          for f in plugins/*/.claude-plugin/plugin.json; do
+            echo "Checking $f"
+            python3 -m json.tool "$f" > /dev/null
+          done
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run claude plugin validate
+        run: claude plugin validate .

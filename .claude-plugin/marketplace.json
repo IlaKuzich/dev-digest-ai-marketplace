@@ -1,0 +1,18 @@
+{
+  "name": "ikdd-ai-marketplace",
+  "owner": {
+    "name": "IlyaKuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "description": "IKDD AI Marketplace — a catalog of Claude Code plugins (agents, skills, commands) for the course project.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "example-plugin",
+      "source": "./plugins/example-plugin",
+      "displayName": "Example Plugin",
+      "description": "Starter plugin demonstrating the expected structure for new marketplace entries.",
+      "version": "0.1.0"
+    }
+  ]
+}
