@@ -1,0 +1,12 @@
+{
+  "name": "sdd-engineering",
+  "displayName": "Spec-Driven Development Engineering",
+  "version": "0.0.0",
+  "description": "PLACEHOLDER — will provide the spec-driven development agent pipeline (spec → plan → implement → verify → document) as a plugin.",
+  "author": {
+    "name": "IlyaKuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["placeholder", "sdd", "spec-driven-development"]
+}

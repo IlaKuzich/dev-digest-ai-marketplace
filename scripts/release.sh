@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Bump a plugin's (or the marketplace's own) version, validate, changelog, commit, and tag.
-# See RELEASE.md for the full process.
+# See docs/RELEASES.md for the full process.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 source "$(dirname "$0")/_lib.sh"

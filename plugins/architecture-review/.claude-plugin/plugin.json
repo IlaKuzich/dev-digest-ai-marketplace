@@ -1,0 +1,12 @@
+{
+  "name": "architecture-review",
+  "displayName": "Architecture Review",
+  "version": "0.0.0",
+  "description": "PLACEHOLDER — will provide a read-only subagent for semantic architecture review of a diff (layering, dependency direction, boundaries).",
+  "author": {
+    "name": "IlyaKuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["placeholder", "architecture", "code-review"]
+}
