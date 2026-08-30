@@ -132,19 +132,19 @@ function buildFeed(entries) {
     .map(
       (e) => `  <entry>
     <title>${xmlEscape(e.summary)}</title>
-    <id>urn:ikdd-marketplace:${xmlEscape(e.commitSha)}:${xmlEscape(e.pluginId || "repo")}:${e.date}</id>
+    <id>urn:dev-digest-ai-marketplace:${xmlEscape(e.commitSha)}:${xmlEscape(e.pluginId || "repo")}:${e.date}</id>
     <updated>${e.date}T00:00:00Z</updated>
-    <link href="https://github.com/IlaKuzich/ikdd-ai-marketplace/commit/${xmlEscape(e.commitSha)}"/>
+    <link href="https://github.com/IlaKuzich/dev-digest-ai-marketplace/commit/${xmlEscape(e.commitSha)}"/>
     <summary>${xmlEscape(e.kindLabel)}</summary>
   </entry>`
     )
     .join("\n");
   return `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>IKDD AI Marketplace — what's new</title>
-  <link href="https://ilakuzich.github.io/ikdd-ai-marketplace/"/>
+  <title>DevDigest AI Marketplace — what's new</title>
+  <link href="https://ilakuzich.github.io/dev-digest-ai-marketplace/"/>
   <updated>${updated}</updated>
-  <id>urn:ikdd-marketplace:feed</id>
+  <id>urn:dev-digest-ai-marketplace:feed</id>
 ${items}
 </feed>
 `;

@@ -1,0 +1,15 @@
+{
+  "name": "architecture-review",
+  "displayName": "Architecture Review",
+  "version": "1.0.0",
+  "description": "A read-only subagent that semantically reviews a diff for architectural boundary violations — onion layering, DI-container discipline, repository/DTO boundaries, and the Next.js Server/Client Component boundary.",
+  "author": {
+    "name": "IlyaKuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["architecture", "code-review", "onion-architecture", "read-only", "next.js", "fastify"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" }
+  ]
+}

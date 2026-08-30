@@ -1,5 +1,5 @@
-export const REPO = "IlaKuzich/ikdd-ai-marketplace";
-export const MARKETPLACE_SLUG = "ikdd-ai-marketplace";
+export const REPO = "IlaKuzich/dev-digest-ai-marketplace";
+export const MARKETPLACE_SLUG = "dev-digest-ai-marketplace";
 
 // Styling only — labels live in i18n/en.js (typeLabels), not here.
 export const TYPE_BADGE = {

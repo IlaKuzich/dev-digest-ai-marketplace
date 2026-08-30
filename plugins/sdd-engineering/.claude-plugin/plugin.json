@@ -1,0 +1,17 @@
+{
+  "name": "sdd-engineering",
+  "displayName": "Spec-Driven Development Engineering",
+  "version": "1.0.0",
+  "description": "A Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, and plan-verifier — orchestrated end-to-end by the run-plan skill, with a manual workflow-retro to grade a finished run.",
+  "author": {
+    "name": "IlyaKuzich",
+    "email": "ilakuzich@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["sdd", "spec-driven-development", "agents", "orchestration", "ears"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" },
+    { "name": "research-tools", "version": "^1.0.0" },
+    { "name": "architecture-review", "version": "^1.0.0" }
+  ]
+}

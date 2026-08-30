@@ -160,8 +160,8 @@ markdown), щоб пошуковий індекс не "спотикався" н
     дата оновлення, ліцензія).
   - Кнопка **"Install"** — копіює в буфер:
     ```
-    /plugin marketplace add IlaKuzich/ikdd-ai-marketplace
-    /plugin install <plugin-name>@ikdd-ai-marketplace
+    /plugin marketplace add IlaKuzich/dev-digest-ai-marketplace
+    /plugin install <plugin-name>@dev-digest-ai-marketplace
     ```
   - Блок **"Схожі артефакти"** — топ-N інших записів за перетином `keywords`
     (Jaccard-подібність), рахується на клієнті або запікається в `index.json` build-time.
@@ -209,8 +209,8 @@ markdown), щоб пошуковий індекс не "спотикався" н
 - **Сторінка "Getting Started"** (`#/getting-started`):
   1. Що таке Claude Code / marketplace (2-3 речення).
   2. Команда підключення маркетплейсу з кнопкою copy:
-     `/plugin marketplace add IlaKuzich/ikdd-ai-marketplace`.
-  3. Як встановити конкретний плагін (`/plugin install <name>@ikdd-ai-marketplace`).
+     `/plugin marketplace add IlaKuzich/dev-digest-ai-marketplace`.
+  3. Як встановити конкретний плагін (`/plugin install <name>@dev-digest-ai-marketplace`).
   4. Лінк "Переглянути всі плагіни" → на головну/пошук.
 - **Гайд-тур при першому візиті** — 3-4 тултіпи, що підсвічують пошук, фільтри, кнопку
   Install. Показується один раз; прапорець `onboarding.seen = true` в `localStorage`.
@@ -260,6 +260,6 @@ markdown), щоб пошуковий індекс не "спотикався" н
    `main` з білдом через Actions? (Рекомендація: `site/` у `main` + Actions build+deploy,
    простіше підтримувати одним PR-флоу.)
 2. Чи потрібен окремий домен, чи лишаємо дефолтний
-   `ilakuzich.github.io/ikdd-ai-marketplace`?
+   `ilakuzich.github.io/dev-digest-ai-marketplace`?
 3. Конвенція `keywords: ["starter"]` для розділу "Рекомендовано для старту" — фіксуємо
    в `CONTRIBUTING.md` як офіційне правило?

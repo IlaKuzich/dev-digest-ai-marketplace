@@ -1,18 +1,40 @@
 {
-  "name": "ikdd-ai-marketplace",
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "dev-digest-ai-marketplace",
   "owner": {
     "name": "IlyaKuzich",
     "email": "ilakuzich@gmail.com"
   },
-  "description": "IKDD AI Marketplace — a catalog of Claude Code plugins (agents, skills, commands) for the course project.",
+  "description": "DevDigest AI Marketplace — a catalog of Claude Code plugins (agents, skills, commands) maintained independently of the DevDigest product repo, with its own release cadence.",
   "version": "0.1.0",
   "plugins": [
     {
-      "name": "example-plugin",
-      "source": "./plugins/example-plugin",
-      "displayName": "Example Plugin",
-      "description": "Starter plugin demonstrating the expected structure for new marketplace entries.",
-      "version": "0.1.0"
+      "name": "engineering-paved-path",
+      "source": "./plugins/engineering-paved-path",
+      "displayName": "Engineering Paved Path",
+      "description": "Shared, project-agnostic engineering skills for the JS/TS ecosystem — React, Next.js, Fastify, PostgreSQL/Drizzle, TypeScript, Zod, security, and Mermaid — reused by namespaced reference from other plugins.",
+      "version": "1.0.0"
+    },
+    {
+      "name": "research-tools",
+      "source": "./plugins/research-tools",
+      "displayName": "Research Tools",
+      "description": "A read-only research subagent that investigates a codebase or the web and reports findings with evidence.",
+      "version": "1.0.0"
+    },
+    {
+      "name": "architecture-review",
+      "source": "./plugins/architecture-review",
+      "displayName": "Architecture Review",
+      "description": "A read-only subagent that semantically reviews a diff for onion-architecture, DI-container, and Next.js RSC-boundary violations.",
+      "version": "1.0.0"
+    },
+    {
+      "name": "sdd-engineering",
+      "source": "./plugins/sdd-engineering",
+      "displayName": "Spec-Driven Development Engineering",
+      "description": "A Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, plan-verifier — orchestrated end to end by the run-plan skill.",
+      "version": "1.0.0"
     }
   ]
 }
