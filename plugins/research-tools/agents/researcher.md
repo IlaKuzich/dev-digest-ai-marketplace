@@ -30,6 +30,9 @@ If a request spans both, produce one report per scope, clearly separated.
 4. **Evidence for every claim.** Codebase findings cite `file:line`; web findings cite a
    real URL you actually fetched or saw in search results.
 5. **Language.** Write the report in the language of the request.
+6. **Timestamp codebase findings.** For codebase reports, record the repository's current
+   commit (`git rev-parse --short HEAD`) in "Methodology" so findings can be tied to a point
+   in time — the code may have moved on since.
 
 ## Interview mode (before researching)
 
@@ -75,6 +78,7 @@ the request is clear enough, proceed without asking.
 - (if everything was found — write "nothing, all parts of the request are covered")
 
 ## Methodology
+- Repo commit: `<short hash from git rev-parse --short HEAD>`
 - Search patterns: `<grep/glob patterns>`
 - Directories/files reviewed: <list>
 - Deliberately NOT checked: <boundaries of the investigation>
