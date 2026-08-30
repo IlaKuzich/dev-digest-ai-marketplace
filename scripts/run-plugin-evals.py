@@ -21,8 +21,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -69,6 +72,26 @@ def plugin_dirs_for(plugin_name: str) -> list[Path]:
             if dep_dir.is_dir():
                 dirs.append(dep_dir)
     return dirs
+
+
+_MODEL_LINE = re.compile(r"^model:\s*\S+\s*$", re.MULTILINE)
+
+
+def strip_model_overrides(dirs: list[Path], tmp_root: Path) -> list[Path]:
+    """Copy each plugin dir with every `model:` frontmatter line removed from its
+    agents/*.md, so a subagent inherits the top-level --model override instead of
+    resolving its own hardcoded alias (e.g. `opus`) to an internal literal ID that
+    isn't a valid OpenRouter slug. Only needed when routing through OpenRouter — the
+    real, shipped `model:` value is what should run in any non-eval context."""
+    out = []
+    for d in dirs:
+        dest = tmp_root / d.name
+        shutil.copytree(d, dest)
+        for agent_md in dest.glob("agents/*.md"):
+            text = agent_md.read_text()
+            agent_md.write_text(_MODEL_LINE.sub("", text, count=1))
+        out.append(dest)
+    return out
 
 
 def openrouter_env(base_env: dict) -> dict:
@@ -137,6 +160,8 @@ def main() -> None:
 
     out_dir = Path(args.out) if args.out else REPO_ROOT / "evals" / "results" / time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     out_dir.mkdir(parents=True, exist_ok=True)
+    override_models = os.environ.get("EVAL_BACKEND") == "openrouter"
+    tmp_root = Path(tempfile.mkdtemp(prefix="plugin-evals-")) if override_models else None
 
     results = []
     for c in cases:
@@ -144,13 +169,18 @@ def main() -> None:
         prompt = c["prompt_path"].read_text()
         criteria = c["criteria_path"].read_text()
         dirs = plugin_dirs_for(c["plugin"])
+        if override_models:
+            # Each case gets its own copy so concurrent-safe if this ever parallelizes.
+            case_tmp = tmp_root / slug
+            case_tmp.mkdir()
+            dirs = strip_model_overrides(dirs, case_tmp)
 
         print(f"[{c['name']}] running...", file=sys.stderr)
         response = run_claude(prompt, REPO_ROOT, dirs, args.model, args.timeout)
         (out_dir / f"{slug}.response.md").write_text(response)
 
         print(f"[{c['name']}] grading...", file=sys.stderr)
-        grading_raw = run_claude(grading_prompt(criteria, response), REPO_ROOT, dirs, args.model, args.timeout)
+        grading_raw = run_claude(grading_prompt(criteria, response), REPO_ROOT, [], args.model, args.timeout)
         try:
             grading = json.loads(grading_raw)
         except json.JSONDecodeError:
@@ -162,6 +192,9 @@ def main() -> None:
             }
         (out_dir / f"{slug}.grading.json").write_text(json.dumps(grading, indent=2))
         results.append({"name": c["name"], **grading["summary"]})
+
+    if tmp_root is not None:
+        shutil.rmtree(tmp_root, ignore_errors=True)
 
     total_passed = sum(r["passed"] for r in results)
     total = sum(r["total"] for r in results)
