@@ -1,6 +1,6 @@
 ---
 name: workflow-retro
-description: MANUAL ONLY — invoke this skill exclusively when the user explicitly types /workflow-retro. NEVER auto-invoke it, never chain into it at the end of a run, and never trigger it from a hook or from another skill — not even after an expensive, surprising, or novel multi-agent chain finishes. When it runs, it reviews HOW a multi-agent run went: it reads the run's own transcripts to report exact token spend, cost, agent roster, spawn order and parallelism, cold-spawn-vs-warm-reuse, duplicated work, and file-ownership breaches; then judges the run against the rules in this plugin's README and writes a dated report to docs/agent-runs/. It grades the WORKFLOW, not the code — `engineering-insights` owns lessons about the code.
+description: "MANUAL ONLY — invoke this skill exclusively when the user explicitly types /workflow-retro. NEVER auto-invoke it, never chain into it at the end of a run, and never trigger it from a hook or from another skill — not even after an expensive, surprising, or novel multi-agent chain finishes. When it runs, it reviews HOW a multi-agent run went: it reads the run's own transcripts to report exact token spend, cost, agent roster, spawn order and parallelism, cold-spawn-vs-warm-reuse, duplicated work, and file-ownership breaches; then judges the run against the rules in this plugin's README and writes a dated report to docs/agent-runs/. It grades the WORKFLOW, not the code — `engineering-insights` owns lessons about the code."
 ---
 
 # /workflow-retro — grade the run, not the code
