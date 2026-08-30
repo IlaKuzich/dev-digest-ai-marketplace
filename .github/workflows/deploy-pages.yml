@@ -1,0 +1,83 @@
+name: Build & deploy catalog site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "scripts/**"
+      - ".claude-plugin/**"
+      - "plugins/**"
+      - ".github/workflows/deploy-pages.yml"
+  pull_request:
+    paths:
+      - "site/**"
+      - "scripts/**"
+      - ".claude-plugin/**"
+      - "plugins/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Runs on every PR and push — a standalone pass/fail check for the catalog
+  # site, separate from the marketplace-harness check in validate.yml.
+  # Does NOT deploy; that only happens after merge to main (job below).
+  build-site:
+    name: Build catalog site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history — build scripts read git log for dates/changelog
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build search index
+        run: node scripts/build-index.mjs
+
+      - name: Build changelog + feed
+        run: node scripts/build-changelog.mjs
+
+      - name: Install site dependencies
+        working-directory: ./site
+        run: npm ci
+
+      - name: Build React app
+        working-directory: ./site
+        run: npm run build
+
+      - name: Configure Pages
+        if: github.event_name == 'push'
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build-site
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
