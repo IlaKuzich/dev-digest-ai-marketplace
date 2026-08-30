@@ -1,12 +1,17 @@
 {
   "name": "sdd-engineering",
   "displayName": "Spec-Driven Development Engineering",
-  "version": "0.0.0",
-  "description": "PLACEHOLDER — will provide the spec-driven development agent pipeline (spec → plan → implement → verify → document) as a plugin.",
+  "version": "1.0.0",
+  "description": "A Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, and plan-verifier — orchestrated end-to-end by the run-plan skill, with a manual workflow-retro to grade a finished run.",
   "author": {
     "name": "IlyaKuzich",
     "email": "ilakuzich@gmail.com"
   },
   "license": "MIT",
-  "keywords": ["placeholder", "sdd", "spec-driven-development"]
+  "keywords": ["sdd", "spec-driven-development", "agents", "orchestration", "ears"],
+  "dependencies": [
+    { "name": "engineering-paved-path", "version": "^1.0.0" },
+    { "name": "research-tools", "version": "^1.0.0" },
+    { "name": "architecture-review", "version": "^1.0.0" }
+  ]
 }

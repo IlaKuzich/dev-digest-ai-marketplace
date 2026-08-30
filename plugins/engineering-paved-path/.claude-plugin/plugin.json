@@ -1,12 +1,12 @@
 {
   "name": "engineering-paved-path",
   "displayName": "Engineering Paved Path",
-  "version": "0.0.0",
-  "description": "PLACEHOLDER — will bundle the team's supported engineering conventions (backend/frontend/full-stack skills, PR self-review gate) as reusable skills.",
+  "version": "1.0.0",
+  "description": "Shared, project-agnostic engineering skills for the JavaScript/TypeScript ecosystem — React, Next.js, Fastify, PostgreSQL/Drizzle, TypeScript, Zod, security, and Mermaid diagramming — installed once and reused by any agent that names them by namespaced skill reference.",
   "author": {
     "name": "IlyaKuzich",
     "email": "ilakuzich@gmail.com"
   },
   "license": "MIT",
-  "keywords": ["placeholder", "paved-path", "engineering-conventions"]
+  "keywords": ["skills", "react", "nextjs", "fastify", "postgresql", "drizzle", "typescript", "zod", "security", "mermaid", "onion-architecture", "paved-path"]
 }
