@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "dev-digest-ai-marketplace",
   "owner": {
     "name": "IlyaKuzich",
@@ -11,29 +12,29 @@
       "name": "engineering-paved-path",
       "source": "./plugins/engineering-paved-path",
       "displayName": "Engineering Paved Path",
-      "description": "PLACEHOLDER — supported engineering conventions as reusable skills.",
-      "version": "0.0.0"
+      "description": "Shared, project-agnostic engineering skills for the JS/TS ecosystem — React, Next.js, Fastify, PostgreSQL/Drizzle, TypeScript, Zod, security, and Mermaid — reused by namespaced reference from other plugins.",
+      "version": "1.0.0"
     },
     {
       "name": "research-tools",
       "source": "./plugins/research-tools",
       "displayName": "Research Tools",
-      "description": "PLACEHOLDER — read-only research subagent.",
-      "version": "0.0.0"
+      "description": "A read-only research subagent that investigates a codebase or the web and reports findings with evidence.",
+      "version": "1.0.0"
     },
     {
       "name": "architecture-review",
       "source": "./plugins/architecture-review",
       "displayName": "Architecture Review",
-      "description": "PLACEHOLDER — read-only architecture review subagent.",
-      "version": "0.0.0"
+      "description": "A read-only subagent that semantically reviews a diff for onion-architecture, DI-container, and Next.js RSC-boundary violations.",
+      "version": "1.0.0"
     },
     {
       "name": "sdd-engineering",
       "source": "./plugins/sdd-engineering",
       "displayName": "Spec-Driven Development Engineering",
-      "description": "PLACEHOLDER — spec-driven development agent pipeline.",
-      "version": "0.0.0"
+      "description": "A Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, plan-verifier — orchestrated end to end by the run-plan skill.",
+      "version": "1.0.0"
     }
   ]
 }

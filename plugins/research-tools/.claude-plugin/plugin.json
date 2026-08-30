@@ -1,12 +1,12 @@
 {
   "name": "research-tools",
   "displayName": "Research Tools",
-  "version": "0.0.0",
-  "description": "PLACEHOLDER — will provide a read-only research subagent (codebase + web investigation, no writes).",
+  "version": "1.0.0",
+  "description": "A read-only research subagent that investigates a codebase or the web and reports findings with evidence — never modifies anything.",
   "author": {
     "name": "IlyaKuzich",
     "email": "ilakuzich@gmail.com"
   },
   "license": "MIT",
-  "keywords": ["placeholder", "research"]
+  "keywords": ["research", "read-only", "investigation", "web-search"]
 }
