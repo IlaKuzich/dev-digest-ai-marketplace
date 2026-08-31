@@ -118,6 +118,11 @@ def run_claude(prompt: str, cwd: Path, plugin_dirs: list[Path], model: str | Non
         cmd += ["--plugin-dir", str(d)]
     if model:
         cmd += ["--model", model]
+    # Headless mode has no user to approve a Write/Edit prompt — an eval agent that writes
+    # files (e.g. spec-creator) would otherwise be denied at that step every time. acceptEdits
+    # auto-approves file edits only; it does not widen Bash/other tool permissions the way
+    # bypassPermissions would (deliberately not used here).
+    cmd += ["--permission-mode", "acceptEdits"]
     env = openrouter_env(os.environ)
     proc = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout)
     if proc.returncode != 0:
