@@ -95,6 +95,16 @@ small sample available.
 **Critical errors:** none attributable to spec-creator itself. The Write-permission denials
 above are a harness/environment limitation (see gap above), not an agent defect.
 
+**Quality gate — PASSED:** an optimization ships only if (a) pass rate does not regress and no
+new critical false negative appears, AND (b) cost or latency measurably improves beyond
+run-to-run noise. (a) holds here: 4/4 "before" and 2/2 "after" runs correctly stayed
+`Status: draft` and flagged the scope ambiguity instead of guessing — zero quality regression,
+zero new false negatives. (b) does **not** hold (see Verdict below) — under this repo's rule
+("don't fabricate a saving the data doesn't support"), failing gate (b) alone is enough to ship
+this as a maintainability fix only, not a cost-optimization win. Both gate conditions are
+evaluated and reported independently rather than collapsed into a single pass/fail, precisely so
+a real quality pass doesn't get mistaken for a cost win it didn't earn.
+
 **Verdict: noise-level, not a confirmed win.** Median total tokens (in+out+cache-create+cache-read)
 across the 4 "before" runs is ~59.6k, pulled up by run 3's outlier (a run that took 3 turns for
 reasons not fully diagnosed — possibly an extra self-correction pass); excluding that outlier,
