@@ -424,11 +424,18 @@ Re-read the file you just wrote and walk this checklist.
 
 | Trace | Rule | If broken |
 |---|---|---|
+| Original request requirement → User story or AC | Every mandatory requirement stated in the caller's request (not just what you already turned into a User story) traces to a criterion | A requirement the caller explicitly asked for, dropped before it ever became a User story — the other rows below can't catch this, since they only check consistency among things you already wrote |
 | User story → AC | Every story is served by ≥1 criterion | A story nobody will build |
 | Edge case → AC | Every Edge case row names a real criterion | An edge case nobody will build |
 | AC → User story or Edge case | Every criterion traces back to something asked for | An invented requirement — cut it |
 | Learning-log lesson → AC or Edge case | Every lesson you judged relevant landed somewhere | You read the rake and stepped on it anyway |
 | Design-source gap → AC / Edge case / clarification | Every gap you found is recorded | The most expensive defect: found now, paid for at implementation |
+
+**The first row is a hard gate.** You do not report the spec as ready to hand off while any
+mandatory requirement from the request lacks a traceable criterion. If a requirement is
+genuinely ambiguous, that's `[NEEDS CLARIFICATION]` territory (Step 7) — but "ambiguous" is not
+an excuse to silently drop a requirement that IS clear. When in doubt whether something the
+caller asked for is a "mandatory requirement" or incidental color, treat it as mandatory.
 
 **Form:**
 - Every criterion has an ID (`AC-1`…, no gaps, no duplicates) and exactly one EARS pattern.
