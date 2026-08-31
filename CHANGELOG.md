@@ -26,3 +26,6 @@ orchestrated by run-plan. Required fixing a broken YAML frontmatter in
 `skills/workflow-retro/SKILL.md` first (an unquoted description containing `: ` mid-string,
 which `claude plugin tag`'s per-file check caught and `claude plugin validate` did not). Tagged
 directly via `claude plugin tag`.
+
+## sdd-engineering--v1.1.0
+spec-creator: gate spec completion on requirement-to-AC traceability (backward-compatible)

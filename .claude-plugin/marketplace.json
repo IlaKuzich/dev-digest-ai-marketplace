@@ -34,7 +34,7 @@
       "source": "./plugins/sdd-engineering",
       "displayName": "Spec-Driven Development Engineering",
       "description": "A Spec-Driven Development agent pipeline — spec-creator, implementation-planner, implementer, plan-verifier — orchestrated end to end by the run-plan skill.",
-      "version": "1.0.0"
+      "version": "1.1.0"
     }
   ]
 }
